@@ -5,7 +5,7 @@ const screenStoredVal = document.querySelector('.stored');
 let storedVal = 0;
 let currentVal = 0;
 let operator = "";
-let displayVal = "";
+let displayVal = "0";
 let isDecimalDisabled = false;
 
 function init() {
@@ -24,8 +24,8 @@ function init() {
         })
     })
 
-    screenCurrentVal.textContent = currentVal;
-    screenStoredVal.textContent = " ";
+    screenCurrentVal.textContent = displayVal;
+    screenStoredVal.textContent = "";
 }
 
 function updateDisplay(input) {
@@ -35,7 +35,11 @@ function updateDisplay(input) {
         if (input === ".") {
             isDecimalDisabled = true;
         }
-        displayVal += input;
+        if (displayVal[0] === "0" && displayVal.length <= 1 && input !== ".") {
+            displayVal = input;
+        } else {
+            displayVal += input;
+        }
         screenCurrentVal.textContent = displayVal;
     }
     
@@ -69,9 +73,6 @@ function addOperator(input) {
     displayVal = "";
     isDecimalDisabled = false;
     updateStoredDisplay();
-
-    console.log(storedVal);
-    console.log(operator);
 }
 
 function performTask(task) {
@@ -80,6 +81,7 @@ function performTask(task) {
             clearAll();
             break;
         case "backspace":
+            backspace();
             break;
         case "operate":
             break;
@@ -88,14 +90,27 @@ function performTask(task) {
 
 // Tasks
 
+function backspace() {
+    if (displayVal.length <= 1) {
+        displayVal = "0";
+        screenCurrentVal.textContent = displayVal;
+    } else {
+        displayVal = displayVal.substring(0, displayVal.length - 1);
+        if (displayVal[displayVal.length - 1] === ".") {
+            isDecimalDisabled = false;
+        }
+        screenCurrentVal.textContent = displayVal;
+    }
+}
+
 function clearAll() {
-    displayVal = "";
+    displayVal = "0";
     storedVal = 0;
     currentVal = 0;
     operator = "";
     isDecimalDisabled = false;
-    screenCurrentVal.textContent = currentVal;
-    screenStoredVal.textContent = " ";
+    screenCurrentVal.textContent = displayVal;
+    screenStoredVal.textContent = "";
 }
 
 
