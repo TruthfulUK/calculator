@@ -14,3 +14,4 @@ Calculator project from The Odin Project curriculum.
 - Backspace
 - Clear
 - Supports 1 decimal place numbers
+- Operation chaining

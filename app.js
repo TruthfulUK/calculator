@@ -45,9 +45,6 @@ function updateDisplay(input) {
         }
         screenCurrentVal.textContent = displayVal;
     }
-    console.log(storedVal);
-    console.log(currentVal);
-    
 }
 
 // Updates stored values line (storedVal and operator)
@@ -96,7 +93,7 @@ function addOperator(input) {
         updateStoredDisplay();
     // Perform math operation if displayVal is not empty and user clicks another math func (chaining)
     } else if (storedVal !== undefined && displayVal !== "") {
-        calculation = operate(operator, storedVal, Number.parseFloat(displayVal));
+        const calculation = operate(operator, storedVal, Number.parseFloat(displayVal));
         storedVal = calculation;
         operator = input;
         isDecimalDisabled = false;
@@ -120,6 +117,21 @@ function addOperator(input) {
 
 // Perform math operation if "=" button is clicked (i.e not chained operation)
 function verifyOperate() {
+    function displayResult(calculation) {
+        isDecimalDisabled = false;
+        storedVal = undefined;
+        operator = undefined;
+        displayVal = calculation.toString();
+        screenCurrentVal.textContent = displayVal;
+        screenStoredVal.textContent = "";
+    }
+    if (storedVal !== undefined && displayVal === "") {
+        const calculation = operate(operator, storedVal, storedVal);
+        displayResult(calculation);
+    } else if ((storedVal !== undefined && displayVal !== "")) {
+        const calculation = operate(operator, storedVal, Number.parseFloat(displayVal));
+        displayResult(calculation);
+    }
     
 }
 
@@ -158,16 +170,22 @@ function operate(operator, a, b) {
     switch(operator) {
         case "add":
             result = add(a, b);
-            return Math.round((result + Number.EPSILON) * 100000000000) / 100000000000;
+            return Math.round((result + Number.EPSILON) * 10000000) / 10000000;
         case "subtract":
             result = subtract(a, b);
-            return Math.round((result + Number.EPSILON) * 100000000000) / 100000000000;
+            return Math.round((result + Number.EPSILON) * 10000000) / 10000000;
         case "multiply":
             result = multiply(a, b);
-            return Math.round((result + Number.EPSILON) * 100000000000) / 100000000000;
+            return Math.round((result + Number.EPSILON) * 10000000) / 10000000;
         case "divide":
-            result = divide(a, b);
-            return Math.round((result + Number.EPSILON) * 100000000000) / 100000000000;
+            if (a === 0 || b === 0) {
+                alert('Infinity - are you happy now?')
+                clearAll();
+                return;
+            } else {
+                result = divide(a, b);
+                return Math.round((result + Number.EPSILON) * 10000000) / 10000000;
+            }
         default:
             console.error("Unknown operator");
     }
