@@ -2,13 +2,14 @@ const buttons = document.querySelectorAll('button');
 const screenCurrentVal = document.querySelector('.value');
 const screenStoredVal = document.querySelector('.stored');
 
-let storedVal = 0;
-let currentVal = 0;
-let operator = "";
-let displayVal = "0";
-let isDecimalDisabled = false;
+let storedVal;                  // num
+let currentVal;                 // num 
+let operator;                   // string
+let displayVal = "0";           // string
+let isDecimalDisabled = false;  // bool
 
 function init() {
+    // Initialize button event listeners
     buttons.forEach(button => {
         button.addEventListener("click", e => {
             const clicked = e.target.dataset;
@@ -24,12 +25,14 @@ function init() {
         })
     })
 
+    // Initialize screen
     screenCurrentVal.textContent = displayVal;
     screenStoredVal.textContent = "";
 }
 
+// Updates screen display on value inputs
 function updateDisplay(input) {
-    if (isDecimalDisabled && input === ".") {
+    if (isDecimalDisabled && input === "." || displayVal.length > 13) {
         return
     } else {
         if (input === ".") {
@@ -42,9 +45,12 @@ function updateDisplay(input) {
         }
         screenCurrentVal.textContent = displayVal;
     }
+    console.log(storedVal);
+    console.log(currentVal);
     
 }
 
+// Updates stored values line (storedVal and operator)
 function updateStoredDisplay() {
     let operatorSymbol = "";
     switch(operator) {
@@ -67,14 +73,7 @@ function updateStoredDisplay() {
     screenStoredVal.textContent = `${storedVal} ${operatorSymbol}`;
 }
 
-function addOperator(input) {
-    storedVal = Number.parseFloat(displayVal);
-    operator = input;
-    displayVal = "";
-    isDecimalDisabled = false;
-    updateStoredDisplay();
-}
-
+// Perform task on button event
 function performTask(task) {
     switch(task) {
         case "clear":
@@ -84,12 +83,58 @@ function performTask(task) {
             backspace();
             break;
         case "operate":
+            verifyOperate();
             break;
     }
 }
 
-// Tasks
+// Set operator value or perform math operation (chaining)
+function addOperator(input) {
+    // Update operator variable and stored display if displayVal is empty
+    if (storedVal !== undefined && displayVal === "") {
+        operator = input;
+        updateStoredDisplay();
+    // Perform math operation if displayVal is not empty and user clicks another math func (chaining)
+    } else if (storedVal !== undefined && displayVal !== "") {
+        calculation = operate(operator, storedVal, Number.parseFloat(displayVal));
+        storedVal = calculation;
+        operator = input;
+        isDecimalDisabled = false;
+        displayVal = "";
+        screenCurrentVal.textContent = displayVal;
+        updateStoredDisplay();
+    // Default functionality is storedVal is not assigned a value
+    } else {
+        storedVal = Number.parseFloat(displayVal);
+        operator = input;
+        displayVal = "";
+        screenCurrentVal.textContent = displayVal;
+        isDecimalDisabled = false;
+        updateStoredDisplay();
+    }
+}
 
+/*
+    Tasks
+*/
+
+// Perform math operation if "=" button is clicked (i.e not chained operation)
+function verifyOperate() {
+    
+}
+
+// Reset calculator to initialization state
+function clearAll() {
+    storedVal = undefined;
+    currentVal = undefined;
+    operator = undefined;
+    displayVal = "0";
+    isDecimalDisabled = false;
+    screenCurrentVal.textContent = displayVal;
+    screenStoredVal.textContent = "";
+}
+
+// Remove last character in displayVal string & update screen - defaults to 0
 function backspace() {
     if (displayVal.length <= 1) {
         displayVal = "0";
@@ -103,28 +148,26 @@ function backspace() {
     }
 }
 
-function clearAll() {
-    displayVal = "0";
-    storedVal = 0;
-    currentVal = 0;
-    operator = "";
-    isDecimalDisabled = false;
-    screenCurrentVal.textContent = displayVal;
-    screenStoredVal.textContent = "";
-}
+/* 
+    Math functionality
+*/
 
-
-
+// Operate switch - only explicitly called by other functions
 function operate(operator, a, b) {
+    let result;
     switch(operator) {
         case "add":
-            return add(a, b);
+            result = add(a, b);
+            return Math.round((result + Number.EPSILON) * 100000000000) / 100000000000;
         case "subtract":
-            return subtract(a, b);
+            result = subtract(a, b);
+            return Math.round((result + Number.EPSILON) * 100000000000) / 100000000000;
         case "multiply":
-            return multiply(a, b);
+            result = multiply(a, b);
+            return Math.round((result + Number.EPSILON) * 100000000000) / 100000000000;
         case "divide":
-            return divide(a, b);
+            result = divide(a, b);
+            return Math.round((result + Number.EPSILON) * 100000000000) / 100000000000;
         default:
             console.error("Unknown operator");
     }
