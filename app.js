@@ -118,7 +118,11 @@ function addOperator(input) {
 // Perform math operation if "=" button is clicked (i.e not chained operation)
 function verifyOperate() {
     function displayResult(calculation) {
-        isDecimalDisabled = false;
+        if (calculation.toString().includes(".")) {
+            isDecimalDisabled = true;
+        } else {
+            isDecimalDisabled = false;
+        }
         storedVal = undefined;
         operator = undefined;
         displayVal = calculation.toString();
